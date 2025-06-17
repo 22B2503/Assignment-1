@@ -1,0 +1,171 @@
+import numpy as np
+
+# Generate 2D array
+arr = np.random.randint(1, 51, (5, 4))
+print("Array:\n", arr)
+
+# Anti-diagonal elements
+anti_diag = [arr[i, -1 - i] for i in range(min(arr.shape))]
+print("Anti-diagonal:", anti_diag)
+
+# Max in each row
+row_max = np.max(arr, axis=1)
+print("Max in each row:", row_max)
+
+# Elements <= overall mean
+mean_val = np.mean(arr)
+less_equal_mean = arr[arr <= mean_val]
+print("Elements <= Mean:", less_equal_mean)
+
+# Boundary traversal
+def numpy_boundary_traversal(matrix):
+    top = list(matrix[0])
+    right = list(matrix[1:-1, -1])
+    bottom = list(matrix[-1][::-1])
+    left = list(matrix[-2:0:-1, 0])
+    return top + right + bottom + left
+
+print("Boundary Traversal:", numpy_boundary_traversal(arr))
+
+
+
+
+
+#Question2
+# Create 1D array
+arr = np.random.uniform(0, 10, 20)
+arr = np.round(arr, 2)
+print("Array:", arr)
+
+print("Min:", np.min(arr))
+print("Max:", np.max(arr))
+print("Median:", np.median(arr))
+
+modified_arr = np.where(arr < 5, arr**2, arr)
+print("Modified array:", modified_arr)
+
+def numpy_alternate_sort(array):
+    sorted_arr = np.sort(array)
+    result = []
+    i, j = 0, len(sorted_arr) - 1
+    while i <= j:
+        result.append(sorted_arr[i])
+        if i != j:
+            result.append(sorted_arr[j])
+        i += 1
+        j -= 1
+    return np.array(result)
+
+print("Alternate sorted:", numpy_alternate_sort(arr))
+
+
+
+
+#Question 3
+import pandas as pd
+import random
+
+names = [f"Student{i+1}" for i in range(10)]
+subjects = ['Math', 'Science', 'English', 'Math', 'Science', 'English', 'Math', 'Science', 'English', 'Math']
+scores = [random.randint(50, 100) for _ in range(10)]
+
+df = pd.DataFrame({'Name': names, 'Subject': subjects, 'Score': scores})
+
+# To assign grades
+def assign_grade(score):
+    if score >= 90: return 'A'
+    elif score >= 80: return 'B'
+    elif score >= 70: return 'C'
+    elif score >= 60: return 'D'
+    else: return 'F'
+
+df['Grade'] = df['Score'].apply(assign_grade)
+print("DataFrame:\n", df)
+
+# Sorting by score
+print("Sorted by Score:\n", df.sort_values(by='Score', ascending=False))
+
+# Average scores
+print("Average Score per Subject:\n", df.groupby('Subject')['Score'].mean())
+def pandas_filter_pass(dataframe):
+    return dataframe[dataframe['Grade'].isin(['A', 'B'])]
+
+print("Filtered (A or B):\n", pandas_filter_pass(df))
+
+
+
+
+
+
+Question 4
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
+
+# Dummy data
+positive_reviews = ["I loved it"] * 50
+negative_reviews = ["I hated it"] * 50
+reviews = positive_reviews + negative_reviews
+sentiments = ['positive'] * 50 + ['negative'] * 50
+
+df = pd.DataFrame({'Review': reviews, 'Sentiment': sentiments})
+
+# Vectorization
+vectorizer = CountVectorizer(max_features=500, stop_words='english')
+X = vectorizer.fit_transform(df['Review'])
+y = df['Sentiment']
+
+# Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+#  To train model
+model = MultinomialNB()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))
+
+# Predict function
+def predict_review_sentiment(model, vectorizer, review):
+    vec = vectorizer.transform([review])
+    return model.predict(vec)[0]
+
+print("Prediction:", predict_review_sentiment(model, vectorizer, "It was awesome"))
+
+
+#Question5
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import precision_score, recall_score, f1_score
+
+good_feedback = ["Great product"] * 50
+bad_feedback = ["Very bad"] * 50
+texts = good_feedback + bad_feedback
+labels = ['good'] * 50 + ['bad'] * 50
+
+df2 = pd.DataFrame({'Text': texts, 'Label': labels})
+
+tfidf = TfidfVectorizer(max_features=300, stop_words='english', lowercase=True)
+X = tfidf.fit_transform(df2['Text'])
+y = df2['Label']
+
+# Spliting
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+
+lr = LogisticRegression()
+lr.fit(X_train, y_train)
+y_pred = lr.predict(X_test)
+
+print("Precision:", precision_score(y_test, y_pred, pos_label='good'))
+print("Recall:", recall_score(y_test, y_pred, pos_label='good'))
+print("F1 Score:", f1_score(y_test, y_pred, pos_label='good'))
+
+
+def text_preprocess_vectorize(texts, vectorizer):
+    return vectorizer.transform(texts)
+
+# Example usage
+print("Vectorized Output:", text_preprocess_vectorize(["Amazing quality"], tfidf).toarray())
+
+
+
